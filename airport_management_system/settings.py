@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'inventory.apps.InventoryConfig',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +79,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'airport_db',
-        'USER': 'postgres',
+        'USER': 'anastasiya',
         'PASSWORD': '1920ms8305',
         'HOST': 'localhost',
         'PORT': '',
