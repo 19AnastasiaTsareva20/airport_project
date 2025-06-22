@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Список товаров</title>
+</head>
+<body>
+    <h1>Список товаров</h1>
+    <ul>
+        {% for product in products %}
+        <li>{{ product.name }} (${{ product.price }}), Stock: {{ product.stock_quantity }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    tr:nth-child(even){background-color: #f2f2f2;}
+</style>
+<table>
+    <tr>
+        <th>Наименование</th>
+        <th>Цена</th>
+        <th>Кол-во</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>${{ product.price }}</td>
+        <td>{{ product.stock_quantity }}</td>
+    </tr>
+    {% endfor %}
+</table>
