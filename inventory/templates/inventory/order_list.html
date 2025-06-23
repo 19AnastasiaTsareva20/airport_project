@@ -1,15 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Список заказов</title>
-</head>
-<body>
-    <h1>Список заказов</h1>
-    <ul>
-        {% for order in orders %}
-        <li>Заказ #{{ order.id }}, сумма: ${{ order.total_amount }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Список заказов</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Номер заказа</th>
+                <th scope="col">Дата создания</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.placed_at }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.total_amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,15 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Список заказчиков</title>
-</head>
-<body>
-    <h1>Список заказчиков</h1>
-    <ul>
-        {% for customer in customers %}
-        <li>{{ customer.first_name }} {{ customer.last_name }}, Email: {{ customer.email }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Список заказчиков</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>{{ customer.first_name }}</td>
+                <td>{{ customer.last_name }}</td>
+                <td>{{ customer.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

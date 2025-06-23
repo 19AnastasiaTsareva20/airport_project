@@ -1,15 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Главная страница</title>
-</head>
-<body>
-    <h1>Главная страница</h1>
-    <p>Общая статистика по товару и заказу:</p>
-    <ul>
-        <li>Всего товаров: {{ total_products }}</li>
-        <li>Активных заказов: {{ active_orders }}</li>
-    </ul>
-</body>
-</html>
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Главная страница</h2>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Общее количество товаров</h5>
+                    <p class="card-text">{{ total_products }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Уровень запасов</h5>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="card-text">80%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Количество активных заказов</h5>
+                    <p class="card-text">{{ active_orders }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Статус последней инвентаризации</h5>
+                    <p class="card-text">Не проводилась</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2>Последние операции</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Дата</th>
+                        <th scope="col">Операция</th>
+                        <th scope="col">Товар</th>
+                        <th scope="col">Количество</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2023-10-01</td>
+                        <td>Добавление товара</td>
+                        <td>Товар 1</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>2023-10-02</td>
+                        <td>Удаление товара</td>
+                        <td>Товар 2</td>
+                        <td>5</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

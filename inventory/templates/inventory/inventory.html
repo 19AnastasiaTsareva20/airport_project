@@ -1,14 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Инвентаризация</title>
-</head>
-<body>
-    <h1>Инвентаризация</h1>
-    <p>Данные по инвентаризации:</p>
-    <ul>
-        <li>Итого товаров: {{ total_inventory_items }}</li>
-    </ul>
-</body>
-</html>
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Инвентаризация</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Товар</th>
+                <th scope="col">Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inventory in inventory_levels %}
+            <tr>
+                <td>{{ inventory.product.name }}</td>
+                <td>{{ inventory.current_stock }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
