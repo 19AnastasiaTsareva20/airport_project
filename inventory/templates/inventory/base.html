@@ -5,117 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Информационная система склада аэропорта</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Кастомный CSS */
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .card-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-        .card-text {
-            font-size: 1.1rem;
-        }
-        .progress-bar {
-            height: 20px;
-            background-color: #007bff;
-        }
-        .progress {
-            height: 20px;
-            margin-bottom: 10px;
-        }
-        .table {
-            margin-top: 20px;
-        }
-        .tab-pane {
-            padding: 20px;
-        }
-        .navbar {
-            background-color: #343a40;
-            color: white;
-        }
-        .navbar-brand {
-            color: white;
-        }
-        .nav-link {
-            color: white;
-            cursor: pointer;
-        }
-        .nav-link:hover {
-            background-color: #495057;
-            color: white;
-        }
-        .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .navbar-nav {
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.show.active {
-            display: block;
-        }
-    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'inventory/css/style.css' %}" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Информационная система склада аэропорта</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{% url 'inventory:home' %}">
+                <i class="fas fa-warehouse me-2"></i>
+                Система склада аэропорта
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'inventory:home' %}">Главная</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'inventory:home' %}">
+                            <i class="fas fa-home me-1"></i>Главная
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory:product_list' %}">Товары</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}" href="{% url 'inventory:product_list' %}">
+                            <i class="fas fa-boxes me-1"></i>Товары
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory:customer_list' %}">Заказчики</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}" href="{% url 'inventory:customer_list' %}">
+                            <i class="fas fa-users me-1"></i>Заказчики
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory:order_list' %}">Заказы</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}" href="{% url 'inventory:order_list' %}">
+                            <i class="fas fa-shopping-cart me-1"></i>Заказы
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory:inventory' %}">Инвентаризация</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'inventory' %}active{% endif %}" href="{% url 'inventory:inventory' %}">
+                            <i class="fas fa-clipboard-list me-1"></i>Инвентаризация
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory:reports' %}">Отчёты</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}" href="{% url 'inventory:reports' %}">
+                            <i class="fas fa-chart-bar me-1"></i>Отчёты
+                        </a>
                     </li>
                 </ul>
+                <div class="navbar-nav">
+                    <button class="btn btn-outline-light btn-sm refresh-btn" title="Обновить страницу">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-4">
+        <!-- Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="django-message d-none" data-type="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Toast container будет создан динамически -->
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Подсвечиваем активную ссылку в навигации
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentLocation = location.pathname;
-            const menuItems = document.querySelectorAll('.nav-link');
-            
-            menuItems.forEach(item => {
-                item.classList.remove('active');
-                if(item.getAttribute('href') === currentLocation) {
-                    item.classList.add('active');
-                }
-            });
-        });
-    </script>
+    <script src="{% static 'inventory/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # регистрация REST framework
+    'django_filters',
     'inventory.apps.InventoryConfig',  # приложение inventory
 ]
 
@@ -136,3 +137,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+STATICFILES_DIRS = [
+    BASE_DIR / "inventory" / "static",
+]

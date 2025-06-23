@@ -2,21 +2,247 @@
 
 {% block content %}
 <div class="container">
-    <h2>Отчёты</h2>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Сумма продаж</h5>
-                    <p class="card-text">${{ total_sales }}</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-chart-bar me-2"></i>Отчёты и аналитика</h2>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="exportData('excel', 'reports')">
+                <i class="fas fa-file-excel me-1"></i>Экспорт отчета
+            </button>
+            <button class="btn btn-info">
+                <i class="fas fa-print me-1"></i>Печать
+            </button>
+        </div>
+    </div>
+
+    <!-- Основные финансовые показатели -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-dollar-sign fa-3x mb-2"></i>
+                    <h5>Общие продажи</h5>
+                    <h2>${{ total_sales|floatformat:2 }}</h2>
+                    <small>За весь период</small>
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x mb-2"></i>
+                    <h5>Средний чек</h5>
+                    <h2>${{ average_order_value|floatformat:2 }}</h2>
+                    <small>По всем заказам</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-gradient-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-boxes fa-3x mb-2"></i>
+                    <h5>Стоимость склада</h5>
+                    <h2>${{ total_stock_value|floatformat:2 }}</h2>
+                    <small>Текущая стоимость</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-gradient-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-tag fa-3x mb-2"></i>
+                    <h5>Средняя цена</h5>
+                    <h2>${{ average_product_price|floatformat:2 }}</h2>
+                    <small>За единицу товара</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детальная аналитика -->
+    <div class="row mb-4">
+        <!-- Статистика по заказам -->
         <div class="col-md-6">
             <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shopping-cart me-2"></i>Статистика заказов
+                    </h5>
+                    <small class="text-muted">Последние 30 дней</small>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Средняя цена товара</h5>
-                    <p class="card-text">${{ average_product_price }}</p>
+                    <div class="row text-center mb-3">
+                        <div class="col">
+                            <div class="border-end">
+                                <h4 class="text-primary">{{ total_orders }}</h4>
+                                <small class="text-muted">Всего заказов</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="border-end">
+                                <h4 class="text-success">{{ active_orders }}</h4>
+                                <small class="text-muted">Активные</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h4 class="text-info">{{ total_customers }}</h4>
+                            <small class="text-muted">Клиенты</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Распределение по статусам -->
+                    <h6 class="mb-3">Распределение по статусам:</h6>
+                    {% for status in orders_by_status %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>
+                            {% if status.status == 'active' %}
+                                <i class="fas fa-circle text-success me-1"></i>Активные
+                            {% elif status.status == 'processed' %}
+                                <i class="fas fa-circle text-info me-1"></i>Обработанные
+                            {% elif status.status == 'completed' %}
+                                <i class="fas fa-circle text-secondary me-1"></i>Завершенные
+                            {% else %}
+                                <i class="fas fa-circle text-warning me-1"></i>{{ status.status }}
+                            {% endif %}
+                        </span>
+                        <div>
+                            <span class="badge bg-light text-dark">{{ status.count }}</span>
+                            <small class="text-muted">
+                                ({% widthratio status.count total_orders 100 %}%)
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Анализ товаров -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-boxes me-2"></i>Анализ товаров
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center mb-3">
+                        <div class="col">
+                            <h4 class="text-primary">{{ total_products }}</h4>
+                            <small class="text-muted">Всего товаров</small>
+                        </div>
+                        <div class="col">
+                            <h4 class="text-danger">{{ low_stock_count }}</h4>
+                            <small class="text-muted">Низкий запас</small>
+                        </div>
+                    </div>
+
+                    <!-- Топ товаров по стоимости -->
+                    <h6 class="mb-3">Самые дорогие товары:</h6>
+                    <!-- Здесь можно добавить топ товаров, но это требует дополнительной логики в views -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Детальная аналитика товаров будет добавлена в следующей версии
+                    </div>
+
+                    <!-- Предупреждения -->
+                    {% if low_stock_count > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Внимание:</strong> {{ low_stock_count }} товар(ов) требуют пополнения запасов
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Финансовая сводка -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calculator me-2"></i>Финансовая сводка
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Общая выручка:</strong></td>
+                                    <td class="text-end text-success fw-bold">${{ total_sales|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Средний чек:</strong></td>
+                                    <td class="text-end">${{ average_order_value|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Количество заказов:</strong></td>
+                                    <td class="text-end">{{ total_orders }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Активных клиентов:</strong></td>
+                                    <td class="text-end">{{ total_customers }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Стоимость товаров на складе:</strong></td>
+                                    <td class="text-end text-info fw-bold">${{ total_stock_value|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Средняя цена товара:</strong></td>
+                                    <td class="text-end">${{ average_product_price|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Товарных позиций:</strong></td>
+                                    <td class="text-end">{{ total_products }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Требуют пополнения:</strong></td>
+                                    <td class="text-end text-danger">{{ low_stock_count }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние действия -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Рекомендации
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-lightbulb me-1"></i>Оптимизация запасов</h6>
+                                <p class="mb-0">Проверьте товары с низким запасом и запланируйте закупки.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-chart-line me-1"></i>Рост продаж</h6>
+                                <p class="mb-0">Средний чек составляет ${{ average_order_value|floatformat:2 }}. Рассмотрите возможности увеличения.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-users me-1"></i>Работа с клиентами</h6>
+                                <p class="mb-0">У вас {{ total_customers }} активных клиентов. Подумайте о программе лояльности.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

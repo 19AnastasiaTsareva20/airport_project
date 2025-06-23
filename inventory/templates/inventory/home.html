@@ -2,71 +2,158 @@
 
 {% block content %}
 <div class="container">
-    <h2>Главная страница</h2>
-    <div class="row">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-tachometer-alt me-2"></i>Панель управления</h2>
+        <button class="btn btn-primary" onclick="refreshDashboardStats()">
+            <i class="fas fa-sync-alt me-1"></i>Обновить статистику
+        </button>
+    </div>
+
+    <!-- Предупреждения о низком запасе -->
+    {% if low_stock_count > 0 %}
+    <div class="low-stock-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Внимание!</strong> У вас {{ low_stock_count }} товар(ов) с низким запасом.
+        <a href="{% url 'inventory:inventory' %}" class="alert-link">Перейти к инвентаризации</a>
+    </div>
+    {% endif %}
+
+    <!-- Основные метрики -->
+    <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Общее количество товаров</h5>
-                    <p class="card-text">{{ total_products }}</p>
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-boxes fa-2x mb-2"></i>
+                    <h5 class="card-title">Всего товаров</h5>
+                    <p class="card-text display-6" id="total-products">{{ total_products }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Уровень запасов</h5>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <p class="card-text">80%</p>
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h5 class="card-title">Заказчиков</h5>
+                    <p class="card-text display-6" id="total-customers">{{ total_customers }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Количество активных заказов</h5>
-                    <p class="card-text">{{ active_orders }}</p>
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                    <h5 class="card-title">Активные заказы</h5>
+                    <p class="card-text display-6" id="active-orders">{{ active_orders }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Статус последней инвентаризации</h5>
-                    <p class="card-text">Не проводилась</p>
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                    <h5 class="card-title">Общие продажи</h5>
+                    <p class="card-text display-6" id="total-sales">${{ total_sales|floatformat:2 }}</p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row mt-5">
+
+    <!-- Дополнительная статистика -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line me-2"></i>Финансовые показатели
+                    </h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Средний чек:</strong> ${{ average_order_value|floatformat:2 }}</li>
+                        <li><strong>Средняя цена товара:</strong> ${{ average_product_price|floatformat:2 }}</li>
+                        <li><strong>Стоимость склада:</strong> ${{ total_stock_value|floatformat:2 }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-clipboard-check me-2"></i>Статус заказов
+                    </h5>
+                    {% for status in orders_by_status %}
+                    <div class="d-flex justify-content-between">
+                        <span class="status-{{ status.status }}">{{ status.get_status_display|default:status.status }}</span>
+                        <span class="badge bg-secondary">{{ status.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Товары с низким запасом
+                    </h5>
+                    {% if low_stock_products %}
+                        {% for product in low_stock_products|slice:":5" %}
+                        <div class="d-flex justify-content-between">
+                            <span>{{ product.name|truncatechars:20 }}</span>
+                            <span class="low-stock">{{ product.stock_quantity }}</span>
+                        </div>
+                        {% endfor %}
+                        {% if low_stock_products.count > 5 %}
+                        <small class="text-muted">И еще {{ low_stock_products.count|add:"-5" }} товар(ов)...</small>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-success">Все товары в достаточном количестве</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние операции -->
+    <div class="row">
         <div class="col-md-12">
-            <h2>Последние операции</h2>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Дата</th>
-                        <th scope="col">Операция</th>
-                        <th scope="col">Товар</th>
-                        <th scope="col">Количество</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2023-10-01</td>
-                        <td>Добавление товара</td>
-                        <td>Товар 1</td>
-                        <td>10</td>
-                    </tr>
-                    <tr>
-                        <td>2023-10-02</td>
-                        <td>Удаление товара</td>
-                        <td>Товар 2</td>
-                        <td>5</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Последние операции
+                    </h5>
+                    <a href="{% url 'inventory:order_list' %}" class="btn btn-sm btn-outline-primary">
+                        Все заказы
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Операция</th>
+                                    <th>Товар</th>
+                                    <th>Количество</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2023-10-01</td>
+                                    <td>Добавление товара</td>
+                                    <td>Товар 1</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td>2023-10-02</td>
+                                    <td>Удаление товара</td>
+                                    <td>Товар 2</td>
+                                    <td>5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
