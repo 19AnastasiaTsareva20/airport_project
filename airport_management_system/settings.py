@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = 'django-insecure-%csu@c(0hfb!d*dfnne+q2g_g&zvkr#asz-o=hopxr)=b$)76^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -39,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'inventory.apps.InventoryConfig',  
+    'inventory.apps.InventoryConfig',
+    'django_extensions',  
 ]
 
 MIDDLEWARE = [
@@ -76,6 +78,9 @@ WSGI_APPLICATION = 'airport_management_system.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
+from decouple import config
+SECRET_KEY = 'django-insecure-%csu@c(0hfb!d*dfnne+q2g_g&zvkr#asz-o=hopxr)=b$)76^'
 
 DATABASES = {
     'default': {

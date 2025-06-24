@@ -178,8 +178,7 @@ def report_page(request):
 
 # AJAX представления для обновления данных
 def ajax_dashboard_stats(request):
-    """AJAX endpoint для обновления статистики на главной странице"""
-    if request.is_ajax():
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         stats = get_dashboard_stats()
         return JsonResponse(stats, safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)

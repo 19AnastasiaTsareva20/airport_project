@@ -152,21 +152,36 @@
                     <td>
                         <span class="badge bg-primary">{{ order.products.count }}</span>
                     </td>
-                    <td>
+                                        <td>
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary" title="Просмотр">
+                            <button class="btn btn-outline-primary action-btn" 
+                                    title="Просмотр"
+                                    data-action="view"
+                                    data-type="order"
+                                    data-id="{{ order.id }}">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-warning" title="Редактировать">
+                            <button class="btn btn-outline-warning action-btn" 
+                                    title="Редактировать"
+                                    data-action="edit"
+                                    data-type="order"
+                                    data-id="{{ order.id }}">
                                 <i class="fas fa-edit"></i>
                             </button>
                             {% if order.status == 'active' %}
-                            <button class="btn btn-outline-success" title="Обработать">
+                            <button class="btn btn-outline-success action-btn" 
+                                    title="Обработать"
+                                    data-action="process"
+                                    data-type="order"
+                                    data-id="{{ order.id }}">
                                 <i class="fas fa-check"></i>
                             </button>
                             {% endif %}
-                            <button class="btn btn-outline-danger" title="Удалить"
-                                    onclick="if(confirmDelete('Удалить заказ #{{ order.id }}?')) { /* логика удаления */ }">
+                            <button class="btn btn-outline-danger action-btn" 
+                                    title="Удалить"
+                                    data-action="delete"
+                                    data-type="order"
+                                    data-id="{{ order.id }}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

@@ -85,16 +85,30 @@
                     <td>
                         <span class="badge bg-info">{{ customer.order_set.count }}</span>
                     </td>
-                    <td>
+                                        <td>
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary" title="Редактировать">
+                            <button class="btn btn-outline-primary action-btn" 
+                                    title="Редактировать"
+                                    data-action="edit"
+                                    data-type="customer"
+                                    data-id="{{ customer.id }}"
+                                    data-name="{{ customer.first_name }} {{ customer.last_name }}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-outline-info" title="Просмотр заказов">
+                            <button class="btn btn-outline-info action-btn" 
+                                    title="Просмотр заказов"
+                                    data-action="orders"
+                                    data-type="customer"
+                                    data-id="{{ customer.id }}"
+                                    data-name="{{ customer.first_name }} {{ customer.last_name }}">
                                 <i class="fas fa-shopping-cart"></i>
                             </button>
-                            <button class="btn btn-outline-danger" title="Удалить"
-                                    onclick="if(confirmDelete('Удалить заказчика {{ customer.first_name }} {{ customer.last_name }}?')) { /* логика удаления */ }">
+                            <button class="btn btn-outline-danger action-btn" 
+                                    title="Удалить"
+                                    data-action="delete"
+                                    data-type="customer"
+                                    data-id="{{ customer.id }}"
+                                    data-name="{{ customer.first_name }} {{ customer.last_name }}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
